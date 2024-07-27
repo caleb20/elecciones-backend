@@ -1,6 +1,7 @@
-package com.caleb.elecciones.auth;
+package com.caleb.elecciones;
 
 import com.caleb.elecciones.repository.UsuarioRepository;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,8 +11,10 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Component;
 
 @Configuration
+@Component
 public class ApplicationConfiguration {
     private final UsuarioRepository usuarioRepository;
 

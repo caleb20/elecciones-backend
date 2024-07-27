@@ -1,10 +1,7 @@
 package com.caleb.elecciones.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +26,11 @@ public class Usuario implements UserDetails {
     public String getUsername() {
         return this.correo;
     }
+
+//    @Override
+//    public String getPassword() {
+//        return null;
+//    }
 
     @Override
     public boolean isAccountNonExpired() {

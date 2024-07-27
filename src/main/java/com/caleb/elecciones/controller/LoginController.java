@@ -4,14 +4,13 @@ import com.caleb.elecciones.auth.AuthenticationService;
 import com.caleb.elecciones.auth.JwtService;
 import com.caleb.elecciones.model.Usuario;
 import com.caleb.elecciones.request.LoginRequest;
+import com.caleb.elecciones.request.SingupRequest;
 import com.caleb.elecciones.response.LoginResponse;
-import com.caleb.elecciones.service.login.LoginService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/auth")
 //@RequiredArgsConstructor
 //@CrossOrigin(origins = "http://localhost:5173/") // El origen de tu cliente
 public class LoginController {
@@ -34,14 +33,14 @@ public class LoginController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Usuario> register(@RequestBody Usuario registerUserDto) {
+    public ResponseEntity<Usuario> register(@RequestBody SingupRequest registerUserDto) {
         Usuario registeredUser = authenticationService.signup(registerUserDto);
 
         return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody Usuario loginUserDto) {
+    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest loginUserDto) {
         Usuario authenticatedUser = authenticationService.authenticate(loginUserDto);
 
         String jwtToken = jwtService.generateToken(authenticatedUser);
