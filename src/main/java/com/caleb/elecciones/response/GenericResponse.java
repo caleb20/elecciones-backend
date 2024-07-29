@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 public class GenericResponse<T> {
     private boolean success = true;
-//    private int status;
     private T data;
     private String message;
 
-    public GenericResponse(T data) {this.data = data;}
-
+    public GenericResponse(T data) {
+        this.data = data;
+    }
 }

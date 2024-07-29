@@ -8,6 +8,7 @@ import com.caleb.elecciones.request.LoginRequest;
 import com.caleb.elecciones.request.RefreshTokenRequest;
 import com.caleb.elecciones.request.SingupRequest;
 import com.caleb.elecciones.response.AuthResponse;
+import com.caleb.elecciones.response.LoginResponse;
 import com.caleb.elecciones.service.voto.VotoService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,8 +16,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -27,48 +26,62 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final VotoService votoService;
 
-    public Usuario signup(SingupRequest input) {
+    public AuthResponse signup(SingupRequest singupRequest) {
         Usuario user = new Usuario();
-        user.setCodigo(input.getCodigo());
-        user.setCorreo(input.getCorreo());
-        user.setPassword(passwordEncoder.encode(input.getPassword()));
+        user.setCodigo(singupRequest.getCodigo());
+        user.setCorreo(singupRequest.getCorreo());
+        user.setPassword(passwordEncoder.encode(singupRequest.getPassword()));
 
         Usuario usuario = usuarioRepository.save(user);
         usuario.setPassword(null);
 
-        return usuario;
+        String jwtToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new AuthResponse(jwtToken, refreshToken);
     }
 
-    public Usuario authenticate(LoginRequest input) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        input.getCorreo(),
-                        input.getPassword()
-                )
-        );
+    public LoginResponse authenticate(LoginRequest input) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(input.getCorreo(), input.getPassword()));
 
-        Optional<Usuario> user = usuarioRepository.findByCorreo(input.getCorreo());
-        Voto voto = votoService.verificarVoto(user.orElseThrow().getCodigo());
+        Usuario user = usuarioRepository.findByCorreo(input.getCorreo()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Voto voto = votoService.verificarVoto(user.getCodigo());
 
         if (voto != null) {
             throw new VotoExistenteException("El usuario ya ha votado");
         }
 
-        return user.orElseThrow();
+        // Invalidar tokens anteriores
+        jwtService.invalidateAllTokens(user.getCorreo());
+
+        String jwtToken = jwtService.generateToken(user);
+        LoginResponse loginResponse = new LoginResponse();
+        loginResponse.setToken(jwtToken);
+        loginResponse.setExpiresIn(jwtService.getExpirationTime());
+
+        return loginResponse;
     }
 
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         String refreshToken = request.getRefreshToken();
         String userEmail = jwtService.extractUsername(refreshToken);
 
-        Usuario user = usuarioRepository.findByCorreo(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Usuario user = usuarioRepository.findByCorreo(userEmail).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (jwtService.isTokenValid(refreshToken, user)) {
-            String jwtToken = jwtService.generateToken(user);
-            return new AuthResponse(jwtToken, refreshToken);
+            jwtService.invalidateToken(refreshToken);
+            String newRefreshToken = jwtService.generateRefreshToken(user);
+
+            return new AuthResponse(request.getRefreshToken(), newRefreshToken);
         }
 
         throw new RuntimeException("Invalid Refresh Token");
+    }
+
+    public void logout(String token) {
+        String tokenWithoutBearer = token.substring(7);
+
+        jwtService.invalidateToken(tokenWithoutBearer);
     }
 }

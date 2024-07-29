@@ -6,6 +6,7 @@ import com.caleb.elecciones.model.Usuario;
 import com.caleb.elecciones.request.LoginRequest;
 import com.caleb.elecciones.request.RefreshTokenRequest;
 import com.caleb.elecciones.request.SingupRequest;
+import com.caleb.elecciones.response.AuthResponse;
 import com.caleb.elecciones.response.GenericResponse;
 import com.caleb.elecciones.response.LoginResponse;
 import org.springframework.http.ResponseEntity;
@@ -13,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-//@RequiredArgsConstructor
-//@CrossOrigin(origins = "http://localhost:5173/") // El origen de tu cliente
 public class LoginController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
@@ -25,27 +24,26 @@ public class LoginController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Usuario> register(@RequestBody SingupRequest registerUserDto) {
-        Usuario registeredUser = authenticationService.signup(registerUserDto);
+    public GenericResponse<AuthResponse> signup(@RequestBody SingupRequest singupRequest) {
+//
+        return new GenericResponse<>(true, authenticationService.signup(singupRequest), "Ok");
 
-        return ResponseEntity.ok(registeredUser);
     }
 
     @PostMapping("/login")
-    public GenericResponse<LoginResponse> authenticate(@RequestBody LoginRequest loginUserDto) {
-        Usuario authenticatedUser = authenticationService.authenticate(loginUserDto);
-
-        String jwtToken = jwtService.generateToken(authenticatedUser);
-
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setToken(jwtToken);
-        loginResponse.setExpiresIn(jwtService.getExpirationTime());
-
-        return new GenericResponse<>(true, loginResponse, "Ok");
+    public GenericResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        return new GenericResponse<>(true, authenticationService.authenticate(loginRequest), "Ok");
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
-        return ResponseEntity.ok(authenticationService.refreshToken(request));
+    public GenericResponse<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        return new GenericResponse<>(true, authenticationService.refreshToken(request), "Ok");
+
+    }
+
+    @PostMapping("/logout")
+    public GenericResponse<Boolean> logout(@RequestHeader("Authorization") String token) {
+        authenticationService.logout(token);
+        return new GenericResponse<>(true, true, "Ok");
     }
 }
