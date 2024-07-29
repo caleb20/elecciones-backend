@@ -2,7 +2,9 @@ package com.caleb.elecciones.service.partidopolitico;
 
 import com.caleb.elecciones.model.PartidoPolitico;
 import com.caleb.elecciones.repository.PartidoPoliticoRepository;
+import com.caleb.elecciones.response.GenericResponse;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,8 +20,9 @@ public class PartidoPoliticoServiceImpl implements PartidoPoliticoService {
     }
 
     @Override
-    public List<PartidoPolitico> listar() {
-        return partidoPoliticoRepository.findAll();
+    public GenericResponse<List<PartidoPolitico>> listar() {
+        List<PartidoPolitico> partidos = partidoPoliticoRepository.findAll();
+        return new GenericResponse<>(true, partidos, "Ok");
     }
 
     @Override

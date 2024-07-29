@@ -5,6 +5,7 @@ import com.caleb.elecciones.auth.JwtService;
 import com.caleb.elecciones.model.Usuario;
 import com.caleb.elecciones.request.LoginRequest;
 import com.caleb.elecciones.request.SingupRequest;
+import com.caleb.elecciones.response.GenericResponse;
 import com.caleb.elecciones.response.LoginResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,17 +15,7 @@ import org.springframework.web.bind.annotation.*;
 //@RequiredArgsConstructor
 //@CrossOrigin(origins = "http://localhost:5173/") // El origen de tu cliente
 public class LoginController {
-//    private final LoginService loginService;
-//
-//    // Login que recibe por parámetro(@RequestBody) el objeto usuario para enviar el correo y password al servicio
-//    // que se encarga de realizar la lógica para saber si existe el usuario y si es que ya votó o todavía
-//    @PostMapping
-//    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-//        return loginService.login(loginRequest.getEmail(), loginRequest.getPassword());
-//    }
-
     private final JwtService jwtService;
-
     private final AuthenticationService authenticationService;
 
     public LoginController(JwtService jwtService, AuthenticationService authenticationService) {
@@ -40,7 +31,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginRequest loginUserDto) {
+    public GenericResponse<LoginResponse> authenticate(@RequestBody LoginRequest loginUserDto) {
         Usuario authenticatedUser = authenticationService.authenticate(loginUserDto);
 
         String jwtToken = jwtService.generateToken(authenticatedUser);
@@ -49,6 +40,6 @@ public class LoginController {
         loginResponse.setToken(jwtToken);
         loginResponse.setExpiresIn(jwtService.getExpirationTime());
 
-        return ResponseEntity.ok(loginResponse);
+        return new GenericResponse<>(true, loginResponse, "Ok");
     }
 }

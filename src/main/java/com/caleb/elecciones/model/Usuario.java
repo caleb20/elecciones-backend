@@ -27,11 +27,6 @@ public class Usuario implements UserDetails {
         return this.correo;
     }
 
-//    @Override
-//    public String getPassword() {
-//        return null;
-//    }
-
     @Override
     public boolean isAccountNonExpired() {
         return UserDetails.super.isAccountNonExpired();
