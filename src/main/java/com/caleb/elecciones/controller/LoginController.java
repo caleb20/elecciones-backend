@@ -4,6 +4,7 @@ import com.caleb.elecciones.auth.AuthenticationService;
 import com.caleb.elecciones.auth.JwtService;
 import com.caleb.elecciones.model.Usuario;
 import com.caleb.elecciones.request.LoginRequest;
+import com.caleb.elecciones.request.RefreshTokenRequest;
 import com.caleb.elecciones.request.SingupRequest;
 import com.caleb.elecciones.response.GenericResponse;
 import com.caleb.elecciones.response.LoginResponse;
@@ -41,5 +42,10 @@ public class LoginController {
         loginResponse.setExpiresIn(jwtService.getExpirationTime());
 
         return new GenericResponse<>(true, loginResponse, "Ok");
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequest request) {
+        return ResponseEntity.ok(authenticationService.refreshToken(request));
     }
 }
