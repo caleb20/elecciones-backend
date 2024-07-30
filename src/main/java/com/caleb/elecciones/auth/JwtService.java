@@ -2,6 +2,7 @@ package com.caleb.elecciones.auth;
 
 import com.caleb.elecciones.exception.VotoExistenteException;
 import com.caleb.elecciones.model.Token;
+import com.caleb.elecciones.model.Usuario;
 import com.caleb.elecciones.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -40,16 +41,20 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(Usuario userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("codigoAlumno", userDetails.getCodigo());
+        return generateToken(extraClaims, userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> extraClaims, Usuario userDetails) {
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails, jwtExpiration * 5);
+    public String generateRefreshToken(Usuario userDetails) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("codigoAlumno", userDetails.getCodigo());
+        return buildToken(extraClaims, userDetails, jwtExpiration * 5);
     }
 
     public long getExpirationTime() {

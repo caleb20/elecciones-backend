@@ -22,32 +22,32 @@ public class GlobalExceptionHandler {
 
         if (exception instanceof BadCredentialsException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(401), exception.getMessage());
-            errorDetail.setProperty("description", "The username or password is incorrect");
+            errorDetail.setProperty("description", "El usuario o contraseña es incorrecto");
             genericResponse = new GenericResponse<>(false, errorDetail, "Ocurrió un error");
 
         }
 
         if (exception instanceof AccountStatusException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
-            errorDetail.setProperty("description", "The account is locked");
+            errorDetail.setProperty("description", "La cuenta está bloqueada");
             genericResponse = new GenericResponse<>(false, errorDetail, "Ocurrió un error");
         }
 
         if (exception instanceof AccessDeniedException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
-            errorDetail.setProperty("description", "You are not authorized to access this resource");
+            errorDetail.setProperty("description", "No estás autorizado para ingresar a este recurso");
             genericResponse = new GenericResponse<>(false, errorDetail, "Ocurrió un error");
         }
 
         if (exception instanceof SignatureException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
-            errorDetail.setProperty("description", "The JWT signature is invalid");
+            errorDetail.setProperty("description", "La firma del JWT es inválida");
             genericResponse = new GenericResponse<>(false, errorDetail, "Ocurrió un error");
         }
 
         if (exception instanceof ExpiredJwtException) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
-            errorDetail.setProperty("description", "The JWT token has expired");
+            errorDetail.setProperty("description", "El JWT token ha expirado");
             genericResponse = new GenericResponse<>(false, errorDetail, "Ocurrió un error");
         }
 
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
 
         if (errorDetail == null) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(500), exception.getMessage());
-            errorDetail.setProperty("description", "Unknown internal server error.");
+            errorDetail.setProperty("description", "Error interno.");
             genericResponse = new GenericResponse<>(false, errorDetail, "Ocurrió un error");
         }
 

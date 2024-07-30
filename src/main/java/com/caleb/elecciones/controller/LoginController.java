@@ -31,6 +31,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
+//    @CrossOrigin("*")
     public GenericResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         return new GenericResponse<>(true, authenticationService.authenticate(loginRequest), "Ok");
     }
