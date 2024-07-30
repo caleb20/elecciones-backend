@@ -9,13 +9,15 @@ import com.caleb.elecciones.request.SingupRequest;
 import com.caleb.elecciones.response.AuthResponse;
 import com.caleb.elecciones.response.GenericResponse;
 import com.caleb.elecciones.response.LoginResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class LoginController {
-    private final JwtService jwtService;
+    @Autowired
+    private JwtService jwtService;
     private final AuthenticationService authenticationService;
 
     public LoginController(JwtService jwtService, AuthenticationService authenticationService) {
@@ -37,7 +39,7 @@ public class LoginController {
     }
 
     @PostMapping("/refresh-token")
-    public GenericResponse<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+    public GenericResponse<LoginResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
         return new GenericResponse<>(true, authenticationService.refreshToken(request), "Ok");
 
     }

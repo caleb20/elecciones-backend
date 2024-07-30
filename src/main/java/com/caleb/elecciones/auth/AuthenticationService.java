@@ -32,13 +32,13 @@ public class AuthenticationService {
         user.setCorreo(singupRequest.getCorreo());
         user.setPassword(passwordEncoder.encode(singupRequest.getPassword()));
 
-        Usuario usuario = usuarioRepository.save(user);
-        usuario.setPassword(null);
+        usuarioRepository.save(user);
+//        usuario.setPassword(null);
 
         String jwtToken = jwtService.generateToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+//        String refreshToken = jwtService.generateRefreshToken(user);
 
-        return new AuthResponse(jwtToken, refreshToken);
+        return new AuthResponse(jwtToken);
     }
 
     public LoginResponse authenticate(LoginRequest input) {
@@ -63,19 +63,22 @@ public class AuthenticationService {
         return loginResponse;
     }
 
-    public AuthResponse refreshToken(RefreshTokenRequest request) {
-        String refreshToken = request.getRefreshToken();
-        String userEmail = jwtService.extractUsername(refreshToken);
+    public LoginResponse refreshToken(RefreshTokenRequest request) {
+        String token = request.getToken();
+        String userEmail = jwtService.extractUsername(token);
 
         Usuario user = usuarioRepository.findByCorreo(userEmail).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        if (jwtService.isTokenValid(refreshToken, user)) {
-            jwtService.invalidateToken(refreshToken);
-            String newRefreshToken = jwtService.generateRefreshToken(user);
+        if (jwtService.isTokenValid(token, user)) {
+            jwtService.invalidateToken(token);
+            String refreshToken = jwtService.generateRefreshToken(user);
 
-            return new AuthResponse(request.getRefreshToken(), newRefreshToken);
+            LoginResponse loginResponse = new LoginResponse();
+            loginResponse.setToken(refreshToken);
+            loginResponse.setExpiresIn(jwtService.getRefreshExpirationTime());
+
+            return loginResponse;
         }
-
         throw new RuntimeException("Invalid Refresh Token");
     }
 
