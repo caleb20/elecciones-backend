@@ -4,7 +4,6 @@ import com.caleb.elecciones.model.PartidoPolitico;
 import com.caleb.elecciones.repository.PartidoPoliticoRepository;
 import com.caleb.elecciones.response.GenericResponse;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,8 +14,8 @@ public class PartidoPoliticoServiceImpl implements PartidoPoliticoService {
     private final PartidoPoliticoRepository partidoPoliticoRepository;
 
     @Override
-    public PartidoPolitico guardar(PartidoPolitico partidoPolitico) {
-        return null;
+    public GenericResponse<PartidoPolitico> guardar(PartidoPolitico partidoPolitico) {
+        return new GenericResponse<>(true, partidoPoliticoRepository.save(partidoPolitico), "Ok");
     }
 
     @Override

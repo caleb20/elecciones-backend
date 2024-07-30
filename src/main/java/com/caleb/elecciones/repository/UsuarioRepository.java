@@ -2,11 +2,14 @@ package com.caleb.elecciones.repository;
 
 import com.caleb.elecciones.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByCorreo(String correo);
+    @Query("SELECT u FROM Usuario u LEFT JOIN FETCH u.rol WHERE u.correo = :correo")
+    Optional<Usuario> findByCorreo(@Param("correo") String correo);
 }

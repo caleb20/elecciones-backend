@@ -5,6 +5,7 @@ import com.caleb.elecciones.model.Voto;
 import com.caleb.elecciones.repository.UsuarioRepository;
 import com.caleb.elecciones.response.LoginResponse;
 import com.caleb.elecciones.service.voto.VotoService;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ public class LoginServiceImpl  implements LoginService {
     private final UsuarioRepository usuarioRepository;
     private final VotoService votoService;
 
+    @Transactional
     @Override
     public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
         Usuario usuario = usuarioRepository.findByCorreo(correo)
